@@ -31,6 +31,12 @@ ax_plot_button = plt.subplot2grid(shape=(6, 8), loc=(5, 0), rowspan=1, colspan=1
 ax1_radio_buttons.set_title("X-axis")
 ax2_radio_buttons.set_title("Y-axis")
 
+ax_zoom_histx_plus_button = plt.subplot2grid(shape=(60, 80), loc=(51, 70), rowspan=4, colspan=4, facecolor='grey')
+ax_zoom_histx_minus_button = plt.subplot2grid(shape=(60, 80), loc=(56, 70), rowspan=4, colspan=4, facecolor='grey')
+
+ax_zoom_histy_plus_button = plt.subplot2grid(shape=(60, 80), loc=(50, 71), rowspan=4, colspan=4, facecolor='grey')
+ax_zoom_histy_minus_button = plt.subplot2grid(shape=(60, 80), loc=(50, 76), rowspan=4, colspan=4, facecolor='grey')
+
 button_labels = list(f.keys())
 button_active_color = 'red'
 
@@ -41,6 +47,11 @@ x_radio_buttons = RadioButtons(ax1_radio_buttons, labels=button_labels, active=x
 y_radio_buttons = RadioButtons(ax2_radio_buttons, labels=button_labels, active=ystart_val_idx, activecolor=button_active_color)
 
 plot_button = Button(ax_plot_button, "Plot", color="green")
+
+zoom_histx_plus_button = Button(ax_zoom_histx_plus_button, "+", color='grey')
+zoom_histy_plus_button = Button(ax_zoom_histy_plus_button, "+", color='grey')
+zoom_histx_minus_button = Button(ax_zoom_histx_minus_button, "-", color='grey')
+zoom_histy_minus_button = Button(ax_zoom_histy_minus_button, "-", color='grey')
 
 plt.subplots_adjust(left=0.01, right=0.99, wspace=0.25)
 
@@ -63,17 +74,60 @@ def sel_y_axis(label):
     y_axis_plot = label
     plt.draw()
 
+def increase_xhist_nbins(x):
+    global xhist_nbin
+    ax_x.gca()
+    xhist_nbin += 0.25 * xhist_nbin
+    _, xhist_bins = ax_x.hist(f[x_axis_plot], bins=xhist_nbin)
+    xhist_nbin = len(xhist_bins) -1
+    plt.draw()
+
+def decrease_xhist_nbins(x):
+    global xhist_nbin
+    ax_x.gca()
+    xhist_nbin -= 0.25 * xhist_nbin
+    _, xhist_bins = ax_x.hist(f[x_axis_plot], bins=xhist_nbin)
+    xhist_nbin = len(xhist_bins) -1
+    plt.draw()
+
+
+def increase_yhist_nbins(x):
+    global yhist_nbin
+    ax_y.gca()
+    yhist_nbin += 0.25 * yhist_nbin
+    _, yhist_bins = ax_y.hist(f[y_axis_plot], bins=yhist_nbin)
+    yhist_nbin = len(yhist_bins) -1
+    plt.draw()
+
+
+def decrease_yhist_nbins(x):
+    global yhist_nbin
+    ax_y.gca()
+    yhist_nbin -= 0.25 * yhist_nbin
+    _, yhist_bins = ax_y.hist(f[y_axis_plot], bins=yhist_nbin)
+    yhist_nbin = len(yhist_bins) -1
+    plt.draw()
+
+
 def redraw_plot(x):
+    global xhist_nbin, yhist_nbin
     clear_axes()
     ax_main.plot(f[x_axis_plot], f[y_axis_plot], '.')
     ax_x.set_xlabel(x_axis_plot)
     ax_main.set_ylabel(y_axis_plot)
-    ax_x.hist(f[x_axis_plot]);
-    ax_y.hist(f[y_axis_plot]);
+    _, xhist_bins = ax_x.hist(f[x_axis_plot])
+    _, yhist_bins = ax_y.hist(f[y_axis_plot], orientation='horizontal')
+
+    xhist_nbin = len(xhist_bins) -1
+    yhist_nbin = len(yhist_bins) -1
     plt.draw()
 
 x_radio_buttons.on_clicked(sel_x_axis)
 y_radio_buttons.on_clicked(sel_y_axis)
 plot_button.on_clicked(redraw_plot)
+zoom_histx_plus_button.on_clicked(increase_xhist_nbins)
+zoom_histy_plus_button.on_clicked(increase_yhist_nbins)
+zoom_histx_minus_button.on_clicked(decrease_xhist_nbins)
+zoom_histy_minus_button.on_clicked(decrease_yhist_nbins)
 
 plt.show()
