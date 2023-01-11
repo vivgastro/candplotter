@@ -10,7 +10,7 @@ class MainAxis:
 
     def plot(self):
         self.clear()
-        self.ax.plot(self.collection.df[self.collection.X_label], self.collection.df[self.collection.Y_label], '.')
+        self.ax.plot(self.collection.df[self.collection.X_label], self.collection.df[self.collection.Y_label], '.', alpha=0.1)
         self.ax.set_xlabel(self.collection.X_label)
         self.ax.set_ylabel(self.collection.Y_label)
 
@@ -49,6 +49,8 @@ class HistAxes:
         if nbin is None:
             nbin = self.nbin
         _, bins, _ = self.ax.hist(self.collection.df[self.axis], bins=nbin, orientation = self.orientation)
+        if self._label == 'X_label':
+            self.ax.set_xlabel(self.axis)
         self.nbin = len(bins) -1
         self.draw()
 
