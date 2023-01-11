@@ -7,7 +7,10 @@ import pandas as pd
 from Collection import MyCollection
 from Axes import MainAxis, HistAxes
 
-HDR_keys = ['SNR', 'lpix', 'mpix', 'boxc_width', 'time', 'dm', 'iblk', 'rawsn', 'total_sample', 'obstime_sec', 'mjd', 'dm_pccm3', 'ra_deg', 'dec_deg']
+#HDR_keys = ['SNR', 'lpix', 'mpix', 'boxc_width', 'time', 'dm', 'iblk', 'rawsn', 'total_sample', 'obstime_sec', 'mjd', 'dm_pccm3', 'ra_deg', 'dec_deg']
+#HDR_keys = ['SNR', 'lpix', 'mpix', 'boxc_width', 'time', 'dm', 'iblk', 'rawsn', 'total_sample', 'obstime_sec', 'mjd', 'dm_pccm3', 'ra_deg', 'dec_deg']
+#HDR_keys = ['SNR',     'boxcar',  'DM',      'samp',    'ngroup']
+
 
 
 
@@ -40,6 +43,14 @@ def make_zoom_buttons(fig):
 
 
 def main(args):
+    with open(args.candfile, 'r') as ff:
+        while True:
+            line = ff.readline()
+            if line.strip() == "":
+                continue
+            print("Inferring Header keys from the first non-empty line - \n", line)
+            HDR_keys = line.strip().strip('#').split()
+            break
     f = pd.read_csv(args.candfile, skiprows=1, skipfooter=1, sep="\s+", header = 0, names = HDR_keys)
     fig = plt.figure(figsize=(16.5, 5))
     data = MyCollection(f)
