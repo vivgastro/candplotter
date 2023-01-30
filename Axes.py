@@ -10,7 +10,8 @@ class MainAxis:
 
     def plot(self):
         self.clear()
-        self.ax.plot(self.collection.df[self.collection.X_label], self.collection.df[self.collection.Y_label], '.', alpha=0.1)
+        #self.ax.plot(self.collection.df[self.collection.X_label], self.collection.df[self.collection.Y_label], '.', alpha=0.1)
+        self.ax.scatter(self.collection.df[self.collection.X_label], self.collection.df[self.collection.Y_label], s = self.collection.df['SNR'], alpha=0.75)
         self.ax.set_xlabel(self.collection.X_label)
         self.ax.set_ylabel(self.collection.Y_label)
 
