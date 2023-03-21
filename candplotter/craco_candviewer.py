@@ -4,8 +4,8 @@ from matplotlib.widgets import Button, RadioButtons
 import argparse
 import pandas as pd
 
-from Collection import MyCollection
-from Axes import MainAxis, HistAxes
+from candplotter.Collection import MyCollection
+from candplotter.Axes import MainAxis, HistAxes
 
 #HDR_keys = ['SNR', 'lpix', 'mpix', 'boxc_width', 'time', 'dm', 'iblk', 'rawsn', 'total_sample', 'obstime_sec', 'mjd', 'dm_pccm3', 'ra_deg', 'dec_deg']
 #HDR_keys = ['SNR', 'lpix', 'mpix', 'boxc_width', 'time', 'dm', 'iblk', 'rawsn', 'total_sample', 'obstime_sec', 'mjd', 'dm_pccm3', 'ra_deg', 'dec_deg']
@@ -42,7 +42,16 @@ def make_zoom_buttons(fig):
     return zoom_histx_minus_button, zoom_histx_plus_button, zoom_histy_minus_button, zoom_histy_plus_button
 
 
-def main(args):
+def get_parser():
+    a = argparse.ArgumentParser()
+    a.add_argument('candfile', type=str, help="Path to the file containing candidates")
+
+    args = a.parse_args()
+    return args
+
+
+def main():
+    args = get_parser()
     with open(args.candfile, 'r') as ff:
         while True:
             line = ff.readline()
@@ -93,9 +102,5 @@ def main(args):
 
 
 if __name__ == '__main__':
-    a = argparse.ArgumentParser()
-    a.add_argument('candfile', type=str, help="Path to the file containing candidates")
-
-    args = a.parse_args()
-    main(args)
+    main()
   

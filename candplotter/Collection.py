@@ -4,6 +4,9 @@ class MyCollection(object):
 
     def __init__(self, df):
         self.df = df
+        self.symbols = [".", "o", "+", "x", "v", "^", "*", "s"]
+        self.colors = ['b', 'r', 'g', 'c', 'm', 'y', 'k']
+        self.alpha = 0.75
         self.selections = []
         self.deletions = []
         #self.mask = ~(self.df == np.nan)
