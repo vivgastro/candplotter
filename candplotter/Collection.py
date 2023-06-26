@@ -13,6 +13,8 @@ class MyCollection(object):
         self.keys = list(self.df.keys())
         self._X_label = self.keys[0]
         self._Y_label = self.keys[0]
+        self.size_label = self.keys[0]
+        self.color_label = self.keys[1]
 
     @property
     def X_label(self):
@@ -32,4 +34,16 @@ class MyCollection(object):
             raise ValueError(f"New Y label {new_label} not in self.keys: {self.keys}")
         self._Y_label = new_label
 
+    def set_size_label(self, axis_label):
+        if axis_label not in self.keys:
+            raise ValueError(f"New size label (axis_label) not in self.keys: {self.keys}")
+        self.size_label = axis_label
 
+    def set_color_label(self, axis_label):
+        if axis_label not in self.keys:
+            raise ValueError(f"New color label (axis_label) not in self.keys: {self.keys}")
+        self.color_label = axis_label
+        
+    def on_pick(self, event):
+        ind = event.ind
+        print(self.df.iloc[ind])

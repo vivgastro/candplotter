@@ -15,16 +15,18 @@ from candplotter.Axes import MainAxis, HistAxes
 
 
 def make_main_axes(fig):
-    ax_main = plt.subplot2grid(shape=(6, 8), loc=(0, 2), rowspan=5, colspan=5, fig=fig)
-    ax_y = plt.subplot2grid(shape=(6, 8), loc=(0, 7), rowspan=5, colspan=1, sharey=ax_main, fig=fig)
-    ax_x = plt.subplot2grid(shape=(6, 8), loc=(5, 2), rowspan=1, colspan=5, sharex=ax_main, fig=fig)
+    ax_main = plt.subplot2grid(shape=(60, 80), loc=(0, 29), rowspan=50, colspan=41, fig=fig)
+    ax_y = plt.subplot2grid(shape=(60, 80), loc=(0, 72), rowspan=50, colspan=10, sharey=ax_main, fig=fig)
+    ax_x = plt.subplot2grid(shape=(60, 80), loc=(50, 29), rowspan=10, colspan=41, sharex=ax_main, fig=fig)
 
     return ax_main, ax_x, ax_y
 
 def make_label_selector_axes(fig, button_box_facecolor):
-    ax1_radio_axis = plt.subplot2grid(shape=(6, 8), loc=(1, 0), rowspan=4, colspan=1, facecolor=button_box_facecolor, fig=fig)
-    ax2_radio_axis = plt.subplot2grid(shape=(60, 80), loc=(10, 9), rowspan=40, colspan=8, facecolor=button_box_facecolor, fig=fig)
-    return ax1_radio_axis, ax2_radio_axis
+    ax1_radio_axis = plt.subplot2grid(shape=(60, 80), loc=(10, 0), rowspan=40, colspan=6, facecolor=button_box_facecolor, fig=fig)
+    ax2_radio_axis = plt.subplot2grid(shape=(60, 80), loc=(10, 7), rowspan=40, colspan=6, facecolor=button_box_facecolor, fig=fig)
+    ax3_radio_axis = plt.subplot2grid(shape=(60, 80), loc=(10, 14), rowspan=40, colspan=6, facecolor=button_box_facecolor, fig=fig)
+    ax4_radio_axis = plt.subplot2grid(shape=(60, 80), loc=(10,21), rowspan=40, colspan=6, facecolor=button_box_facecolor, fig=fig)
+    return ax1_radio_axis, ax2_radio_axis, ax3_radio_axis, ax4_radio_axis
 
 def make_zoom_buttons(fig):
     ax_zoom_histx_plus_button = plt.subplot2grid(shape=(60, 80), loc=(51, 70), rowspan=4, colspan=1, facecolor='lightgrey', fig=fig)
@@ -58,8 +60,9 @@ def main():
             if line.strip() == "":
                 continue
             print("Inferring Header keys from the first non-empty line - \n", line)
-            HDR_keys = line.strip().strip('#').split()
+            HDR_keys = line.strip().strip('#').strip().split()
             break
+    print(f"Header keys = {HDR_keys}")
     f = pd.read_csv(args.candfile, skiprows=1, skipfooter=1, sep="\s+", header = 0, names = HDR_keys)
     fig = plt.figure(figsize=(16.5, 5))
     data = MyCollection(f)
@@ -72,11 +75,15 @@ def main():
     hist_x = HistAxes(data, 'X_label', ax_x, fig, 20)
     hist_y = HistAxes(data, 'Y_label', ax_y, fig, 20)
 
-    ax1_radio_axis, ax2_radio_axis = make_label_selector_axes(fig, button_box_facecolor)
+    ax1_radio_axis, ax2_radio_axis, ax3_radio_axis, ax4_radio_axis = make_label_selector_axes(fig, button_box_facecolor)
     ax1_radio_axis.set_title("Y-axis")
     ax2_radio_axis.set_title("X-axis")
+    ax3_radio_axis.set_title("S-axis")
+    ax4_radio_axis.set_title("C-axis")
     x_radio_buttons = RadioButtons(ax2_radio_axis, labels=data.keys, active=0, activecolor=axis_selector_button_active_color)
     y_radio_buttons = RadioButtons(ax1_radio_axis, labels=data.keys, active=0, activecolor=axis_selector_button_active_color)
+    s_radio_buttons = RadioButtons(ax3_radio_axis, labels=data.keys, active=0, activecolor=axis_selector_button_active_color)
+    c_radio_buttons = RadioButtons(ax4_radio_axis, labels=data.keys, active=0, activecolor=axis_selector_button_active_color)
 
     zoom_histx_minus_button, zoom_histx_plus_button, zoom_histy_minus_button, zoom_histy_plus_button = make_zoom_buttons(fig)
 
@@ -92,12 +99,15 @@ def main():
 
     x_radio_buttons.on_clicked(data.set_X_label)
     y_radio_buttons.on_clicked(data.set_Y_label)
+    s_radio_buttons.on_clicked(data.set_size_label)
+    c_radio_buttons.on_clicked(data.set_color_label)
     plot_button.on_clicked(plot_button_action)
     zoom_histx_plus_button.on_clicked(hist_x.increase_nbins)
     zoom_histy_plus_button.on_clicked(hist_y.increase_nbins)
     zoom_histx_minus_button.on_clicked(hist_x.decrease_nbins)
     zoom_histy_minus_button.on_clicked(hist_y.decrease_nbins)   
-
+    
+    fig.canvas.mpl_connect('pick_event', data.on_pick)
     plt.show()
 
 
