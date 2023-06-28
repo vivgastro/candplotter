@@ -44,6 +44,9 @@ def make_zoom_buttons(fig):
     return zoom_histx_minus_button, zoom_histx_plus_button, zoom_histy_minus_button, zoom_histy_plus_button
 
 def make_select_button_axes(fig):
+    ax_plot_button = plt.subplot2grid(shape=(60, 80), loc=(51, 0), rowspan=9, colspan=8, facecolor='green', fig=fig)
+    plot_button = Button(ax_plot_button, "Plot", color="green")
+    plot_button.drawon = False
     ax_select_button = plt.subplot2grid(shape=(60, 80), loc=(51, 9), rowspan=9, colspan=4, facecolor='cyan', fig=fig)
     select_button = Button(ax = ax_select_button, label='Select', color='cyan')
     select_button.drawon = False    #This disables triggering of fig.canvas.draw_idle() when you hover over the button -- which if left True will make the rectangular selections disappear upon hovering
@@ -53,8 +56,11 @@ def make_select_button_axes(fig):
     ax_reset_button = plt.subplot2grid(shape=(60, 80), loc=(51, 19), rowspan=9, colspan=4, facecolor='lightgrey', fig=fig)
     reset_button = Button(ax = ax_reset_button, label='Reset', color='lightgrey')
     reset_button.drawon = False
+    ax_export_button = plt.subplot2grid(shape=(60, 80), loc=(51, 24), rowspan=9, colspan=3, facecolor='white', fig=fig)
+    export_button = Button(ax = ax_export_button, label='Export', color='white')
+    export_button.drawon = False
 
-    return select_button, delete_button, reset_button
+    return plot_button, select_button, delete_button, reset_button, export_button
 
 def get_parser():
     a = argparse.ArgumentParser()
@@ -75,7 +81,7 @@ def run_plotter(df):
     hist_x = HistAxes(data, 'X_label', ax_x, fig, 20)
     hist_y = HistAxes(data, 'Y_label', ax_y, fig, 20)
 
-    select_button, delete_button, reset_button = make_select_button_axes(fig)
+    plot_button, select_button, delete_button, reset_button, export_button = make_select_button_axes(fig)
 
     def rect_select_action(eclick, erelease):
         x1 = eclick.xdata
@@ -95,7 +101,11 @@ def run_plotter(df):
     def reset_button_action(_):
         data.reset_df()
         plot_button_action(0)
-
+    
+    def export_button_action(_):
+        #outname=input("Enter the name of the output filename (hit enter for default):\n")
+        outname = ""
+        data.export_df(outname)
     
     rect_selector = RectangleSelector(ax_main, rect_select_action, drawtype='box', button=[3], interactive=True, useblit=True)
 
@@ -110,10 +120,6 @@ def run_plotter(df):
     c_radio_buttons = RadioButtons(ax4_radio_axis, labels=data.keys, active=0, activecolor=axis_selector_button_active_color)
 
     zoom_histx_minus_button, zoom_histx_plus_button, zoom_histy_minus_button, zoom_histy_plus_button = make_zoom_buttons(fig)
-
-    ax_plot_button = plt.subplot2grid(shape=(60, 80), loc=(51, 0), rowspan=9, colspan=8, facecolor='green', fig=fig)
-    plot_button = Button(ax_plot_button, "Plot", color="green")
-    plot_button.drawon = False
 
     plt.subplots_adjust(left=0.01, right=0.99, wspace=0.25)
 
@@ -134,6 +140,7 @@ def run_plotter(df):
     select_button.on_clicked(select_button_action)
     delete_button.on_clicked(delete_button_action) 
     reset_button.on_clicked(reset_button_action)
+    export_button.on_clicked(export_button_action)
     
     fig.canvas.mpl_connect('pick_event', data.on_pick)
     plt.show()

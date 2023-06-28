@@ -9,7 +9,6 @@ class MyCollection(object):
         self.colors = ['b', 'r', 'g', 'c', 'm', 'y', 'k']
         self.alpha = 0.75
         #self.mask = ~(self.df == np.nan)
-        self.keys = list(self.df.keys())
         self._X_label = self.keys[0]
         self._Y_label = self.keys[0]
         self.size_label = self.keys[0]
@@ -18,6 +17,11 @@ class MyCollection(object):
     @property
     def df(self):
         return self._df
+    
+    @property
+    def keys(self):
+        return list(self.df.keys())
+    
     
     def reset_df(self):
         self._df = self._orig_df
@@ -33,6 +37,15 @@ class MyCollection(object):
 
     def deselect_mask(self):
         self._df = self.df[~self.mask]
+
+    def export_df(self, outname):
+        if outname.strip() == "":
+            import time
+            lt = time.localtime()
+            outname = f"candplotter_export_{lt.tm_year}.{lt.tm_mon:02g}.{lt.tm_mday:02g}.{lt.tm_hour:02g}.{lt.tm_min:02g}.{lt.tm_sec:02g}.txt"
+        print(f"Exporting {len(self.df)} rows to {outname} ...")
+        self.df.to_csv(outname, sep="\t", index=False)
+        print("Done!")
         
     @property
     def X_label(self):
