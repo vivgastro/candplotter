@@ -6,6 +6,7 @@ import pandas as pd
 
 from candplotter.Collection import MyCollection
 from candplotter.Axes import MainAxis, HistAxes
+import candplotter.default_buttons as D
 
 #HDR_keys = ['SNR', 'lpix', 'mpix', 'boxc_width', 'time', 'dm', 'iblk', 'rawsn', 'total_sample', 'obstime_sec', 'mjd', 'dm_pccm3', 'ra_deg', 'dec_deg']
 #HDR_keys = ['SNR', 'lpix', 'mpix', 'boxc_width', 'time', 'dm', 'iblk', 'rawsn', 'total_sample', 'obstime_sec', 'mjd', 'dm_pccm3', 'ra_deg', 'dec_deg']
@@ -114,10 +115,16 @@ def run_plotter(df, title = " "):
     ax2_radio_axis.set_title("X-axis")
     ax3_radio_axis.set_title("Size")
     ax4_radio_axis.set_title("Color")
-    x_radio_buttons = RadioButtons(ax2_radio_axis, labels=data.keys, active=0, activecolor=axis_selector_button_active_color)
-    y_radio_buttons = RadioButtons(ax1_radio_axis, labels=data.keys, active=0, activecolor=axis_selector_button_active_color)
-    s_radio_buttons = RadioButtons(ax3_radio_axis, labels=data.keys, active=0, activecolor=axis_selector_button_active_color)
-    c_radio_buttons = RadioButtons(ax4_radio_axis, labels=data.keys, active=0, activecolor=axis_selector_button_active_color)
+
+    X_def = min([len(data.keys), D.X_default])
+    Y_def = min([len(data.keys), D.Y_default])
+    S_def = min([len(data.keys), D.S_default])
+    C_def = min([len(data.keys), D.C_default])
+
+    x_radio_buttons = RadioButtons(ax2_radio_axis, labels=data.keys, active=X_def, activecolor=axis_selector_button_active_color)
+    y_radio_buttons = RadioButtons(ax1_radio_axis, labels=data.keys, active=Y_def, activecolor=axis_selector_button_active_color)
+    s_radio_buttons = RadioButtons(ax3_radio_axis, labels=data.keys, active=S_def, activecolor=axis_selector_button_active_color)
+    c_radio_buttons = RadioButtons(ax4_radio_axis, labels=data.keys, active=C_def, activecolor=axis_selector_button_active_color)
 
     zoom_histx_minus_button, zoom_histx_plus_button, zoom_histy_minus_button, zoom_histy_plus_button = make_zoom_buttons(fig)
 
@@ -144,6 +151,12 @@ def run_plotter(df, title = " "):
     
     fig.canvas.mpl_connect('pick_event', data.on_pick)
     fig.suptitle(title)
+
+    data.set_X_label(data.keys[X_def])
+    data.set_Y_label(data.keys[Y_def])
+    data.set_size_label(data.keys[S_def])
+    data.set_color_label(data.keys[C_def])
+    plot_button_action(0)
     plt.show()
 
 def main():
