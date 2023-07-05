@@ -69,7 +69,7 @@ def get_parser():
     args = a.parse_args()
     return args
 
-def run_plotter(df):
+def run_plotter(df, title = " "):
     fig = plt.figure(figsize=(16.5, 5))
     data = MyCollection(df)
     
@@ -143,6 +143,7 @@ def run_plotter(df):
     export_button.on_clicked(export_button_action)
     
     fig.canvas.mpl_connect('pick_event', data.on_pick)
+    fig.suptitle(title)
     plt.show()
 
 def main():
@@ -157,7 +158,7 @@ def main():
             break
     print(f"Header keys = {HDR_keys}")
     df = pd.read_csv(args.candfile, skiprows=1, skipfooter=1, sep="\s+", header = 0, names = HDR_keys)
-    run_plotter(df)
+    run_plotter(df, title = args.candfile)
     
 if __name__ == '__main__':
     main()
