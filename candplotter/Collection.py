@@ -1,4 +1,4 @@
-
+import numpy as np
 
 class MyCollection(object):
 
@@ -78,3 +78,20 @@ class MyCollection(object):
     def on_pick(self, event):
         ind = event.ind
         print(self.df.iloc[ind])
+
+    @property
+    def size_axis(self):
+        q1,q3 = np.percentile(self.df[self.size_label], [15, 85])
+        if q1 == q3:
+            size_data = 15
+        else:
+            q1_marker_size = 10
+            q3_marker_size = 30
+            old_iqr = q3 - q1
+            new_iqr = q3_marker_size - q1_marker_size
+            size_data = (self.df[self.size_label] - q1) / old_iqr * new_iqr + q1_marker_size
+        return size_data
+
+
+
+
