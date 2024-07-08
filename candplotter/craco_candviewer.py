@@ -66,7 +66,10 @@ def make_select_button_axes(fig):
 def get_parser():
     a = argparse.ArgumentParser()
     a.add_argument('candfile', type=str, help="Path to the file containing candidates")
-
+    a.add_argument('-sep', type=str, help="Delimeter to use when parsing the file (def = \s+)", default=None)
+    a.add_argument('-skiprows', type=int, help="No of lines to skip at the top(def = 1)", default=1)
+    a.add_argument('-skip_footer', type=int, help="No of lines to skip at the end (def = 0)", default=0)
+    
     args = a.parse_args()
     return args
 
@@ -161,16 +164,19 @@ def run_plotter(df, title = " "):
 
 def main():
     args = get_parser()
+    sep = "\t"
+    if args.sep:
+        sep = args.sep
     with open(args.candfile, 'r') as ff:
         while True:
             line = ff.readline()
             if line.strip() == "":
                 continue
             print("Inferring Header keys from the first non-empty line - \n", line)
-            HDR_keys = line.strip().strip('#').strip().split()
+            HDR_keys = line.strip().strip('#').strip().split(sep)
             break
     print(f"Header keys = {HDR_keys}")
-    df = pd.read_csv(args.candfile, skiprows=1, skipfooter=1, sep="\s+", header = 0, names = HDR_keys)
+    df = pd.read_csv(args.candfile, skiprows=args.skiprows, skipfooter=args.skip_footer, sep=sep, header = 0, names = HDR_keys)
     run_plotter(df, title = args.candfile)
     
 if __name__ == '__main__':
